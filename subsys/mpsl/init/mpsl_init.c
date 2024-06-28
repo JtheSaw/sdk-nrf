@@ -185,8 +185,10 @@ static int mpsl_lib_init(const struct device *dev)
 			   mpsl_timer0_isr_wrapper, IRQ_CONNECT_FLAGS);
 	IRQ_DIRECT_CONNECT(RTC0_IRQn, MPSL_HIGH_IRQ_PRIORITY,
 			   mpsl_rtc0_isr_wrapper, IRQ_CONNECT_FLAGS);
+#if !CONFIG_ESB_SHOCKBURST
 	IRQ_DIRECT_CONNECT(RADIO_IRQn, MPSL_HIGH_IRQ_PRIORITY,
 			   mpsl_radio_isr_wrapper, IRQ_CONNECT_FLAGS);
+#endif
 
 	return 0;
 }

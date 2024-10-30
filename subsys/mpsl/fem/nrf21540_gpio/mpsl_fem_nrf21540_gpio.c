@@ -30,6 +30,10 @@
 #endif
 #endif /* !defined(CONFIG_MPSL_FEM_PIN_FORWARDER) */
 
+#if CONFIG_OPTIONAL_FEM_INIT
+#include <hal/nrf_power.h>
+#endif
+
 #if !defined(CONFIG_MPSL_FEM_PIN_FORWARDER)
 
 #define MPSL_FEM_GPIO_POLARITY_GET(dt_property) \
@@ -106,6 +110,15 @@ static int egu_channel_alloc(uint8_t *egu_channels, size_t size, uint8_t egu_ins
 #if IS_ENABLED(CONFIG_MPSL_FEM_NRF21540_GPIO)
 static int fem_nrf21540_gpio_configure(void)
 {
+#if CONFIG_OPTIONAL_FEM_INIT
+	// Read GGPREGRET2 register to check if the FEM configuration is already done
+	uint8_t ggpregret2 = nrf_power_gpregret2_get(NRF_POWER);
+	if (ggpregret2 != 0x80) {
+		// FEM initialization not requested
+		return 0;
+	}
+#endif
+
 	int err;
 
 #if DT_NODE_HAS_PROP(DT_NODELABEL(nrf_radio_fem), tx_en_gpios)
